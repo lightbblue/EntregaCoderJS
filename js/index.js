@@ -1,7 +1,52 @@
-let datosDiagnostico = [];
+const datosDiagnostico = [
+	{
+		"id": 0,
+		"problema": "No enciende",
+		"soluciones": [
+			"Verificar que el cable de corriente esté enchufado correctamente.",
+			"Probar con otro enchufe o con otro cable de corriente.",
+			"Comprobar que el botón de encendido del monitor también esté activado."
+		]
+	},
+	{
+		"id": 1,
+		"problema": "No hay internet",
+		"soluciones": [
+			"Confirmar si el Wi-Fi está activado en la PC.",
+			"Reiniciar el router/modem y la PC.",
+			"Probar conectar otro dispositivo para verificar si la red funciona."
+		]
+	},
+	{
+		"id": 2,
+		"problema": "Va muy lento",
+		"soluciones": [
+			"Cerrar aplicaciones pesadas y reiniciar la PC.",
+			"Verificar uso de CPU/ram en el administrador de tareas.",
+			"Eliminar archivos temporales y reiniciar nuevamente."
+		]
+	},
+	{
+		"id": 3,
+		"problema": "Se congela / no responde",
+		"soluciones": [
+			"Esperar 1-2 minutos por si recupera respuesta.",
+			"Intentar cerrar la aplicación problemática desde el administrador de tareas.",
+			"Reiniciar la PC en modo normal; si persiste, probar en modo seguro."
+		]
+	},
+	{
+		"id": 4,
+		"problema": "Aparece pantalla azul",
+		"soluciones": [
+			"Anotar el código de error si aparece y buscarlo en la web.",
+			"Desconectar dispositivos externos recién conectados.",
+			"Revisar actualizaciones pendientes del sistema operativo."
+		]
+	}
+];
 
 function generarDiagnosticoHTML(indiceProblema) {
-
 	const item = datosDiagnostico.find(d => d.id == indiceProblema);
 
 	if (!item) {
@@ -107,20 +152,6 @@ function iniciarApp() {
 	});
 }
 
-// Cuando cargue todo el html traigo los datos del json
 document.addEventListener("DOMContentLoaded", () => {
-	fetch('json/data.json')
-		.then(response => {
-			return response.json();
-		})
-		.then(data => {
-			datosDiagnostico = data;
-			iniciarApp();
-		})
-		.catch(err => {
-			const resultadoContainer = document.getElementById("resultado-container");
-			if (resultadoContainer) {
-				resultadoContainer.innerHTML = `<p style='color: red;'>Error ${err}: No se pudieron cargar los datos de diagnóstico.</p>`;
-			}
-		});
+	iniciarApp();
 });
