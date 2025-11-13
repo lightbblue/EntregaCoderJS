@@ -1,123 +1,126 @@
-const problemas = [
-  "No enciende",
-  "No hay internet",
-  "Va muy lento",
-  "Se congela / no responde",
-  "Aparece pantalla azul"
-];
+let datosDiagnostico = [];
 
-const soluciones = [
-  //problemas[0] No Enciende
-  [
-    "Verificar que el cable de corriente esté enchufado correctamente.",
-    "Probar con otro enchufe o con otro cable de corriente.",
-    "Comprobar que el botón de encendido del monitor también esté activado."
-  ],
-  //problemas[1] No hay internet
-  [
-    "Confirmar si el Wi-Fi está activado en la PC.",
-    "Reiniciar el router/modem y la PC.",
-    "Probar conectar otro dispositivo para verificar si la red funciona."
-  ],
-  //problemas[2] Va muy lento
-  [
-    "Cerrar aplicaciones pesadas y reiniciar la PC.",
-    "Verificar uso de CPU/ram en el administrador de tareas.",
-    "Eliminar archivos temporales y reiniciar nuevamente."
-  ],
-  //problemas[3] Se congela / no responde
-  [
-    "Esperar 1-2 minutos por si recupera respuesta.",
-    "Intentar cerrar la aplicación problemática desde el administrador de tareas.",
-    "Reiniciar la PC en modo normal; si persiste, probar en modo seguro."
-  ],
-  //problemas[4] Aparece pantalla azul
-  [
-    "Anotar el código de error si aparece y buscarlo en la web.",
-    "Desconectar dispositivos externos recién conectados.",
-    "Revisar actualizaciones pendientes del sistema operativo."
-  ]
-];
+function generarDiagnosticoHTML(indiceProblema) {
 
-function pedirProblema() {
-  let textoMenu = "=== SIMULADOR DE DIAGNÓSTICO DE PC ===\n\nElegí el número del problema que presenta la PC:\n\n";
+	const item = datosDiagnostico.find(d => d.id == indiceProblema);
 
-  let contador = 1;
-  for (let p of problemas) {
-    textoMenu += contador + ". " + p + "\n";
-    contador++;
-  }
+	if (!item) {
+		return "<p>Error: No se encontró el problema seleccionado.</p>";
+	}
 
-  textoMenu += "\nIngresá el número (por ejemplo 1):";
+	const problemaNombre = item.problema;
+	const pasosSolucion = item.soluciones;
+	let htmlResultado = `<h3>Diagnóstico sugerido para: ${problemaNombre}</h3>`;
+	htmlResultado += "<p>Pasos recomendados:</p>";
+	htmlResultado += "<ul>";
 
-  const entrada = prompt(textoMenu);
-  if (entrada === null) {
-    return null;
-  }
+	for (const paso of pasosSolucion) {
+		htmlResultado += `<li>${paso}</li>`;
+	}
+	htmlResultado += "</ul>";
 
-  const opcion = parseInt(entrada);
-  if (Number.isNaN(opcion) || opcion < 1 || opcion > problemas.length) {
-    alert("Opción inválida. Se cancelará este diagnóstico.");
-    return null;
-  }
+	// Tips para los casos de No enciende y Va muy lento
+	if (item.id === 0) {
+		htmlResultado += "<p><strong>Tip:</strong> si después de probar cables y enchufes sigue sin encender, acudir a servicio técnico.</p>";
+	} else if (item.id === 2) {
+		htmlResultado += "<p><strong>Tip:</strong> cerrar programas al iniciar sesión o aumentar memoria puede mejorar el rendimiento.</p>";
+	}
 
-  // Posición
-  return opcion - 1;
+	return htmlResultado;
 }
 
-function generarDiagnostico(indiceProblema) {
-  const resultado = [];
-  resultado.push("Diagnóstico sugerido para: " + problemas[indiceProblema]);
-  resultado.push("");
-
-  resultado.push("Pasos recomendados:");
-  for (let paso of soluciones[indiceProblema]) {
-    resultado.push("- " + paso);
-  }
-  resultado.push("");
-
-  if (indiceProblema === 0) { 
-    resultado.push("Recomendación: si después de probar cables y enchufes sigue sin encender, acudir a servicio técnico.");
-    resultado.push("");
-  } else if (indiceProblema === 2) {
-    resultado.push("Tip: cerrar programas al iniciar sesión o aumentar memoria puede mejorar el rendimiento.");
-    resultado.push("");
-  }
-
-  return resultado;
+function cargarSelectProblemas(elemento) {
+	if (!elemento) return;
+	// Creo los options dentro del select
+	datosDiagnostico.forEach(item => {
+		const opcion = document.createElement("option");
+		opcion.value = item.id;
+		opcion.textContent = item.problema;
+		elemento.appendChild(opcion);
+	});
 }
 
-function mostrarResultadosYConfirmar(lineas) { 
-  for (let linea of lineas) { 
-    console.log(linea); 
-  } 
-  alert("Se han mostrado los pasos recomendados en la consola.\n"); 
+function obtenerHistorialStorage() {
+	const historialJSON = localStorage.getItem("diagnosticoHistorial");
+	return historialJSON ? JSON.parse(historialJSON) : [];
 }
 
-function iniciarSimulador() {
-  alert("Bienvenido al Simulador de Diagnóstico de PC\nVamos a ayudarte a identificar y solucionar problemas comunes.");
-
-  let seguir = true;
-
-  while (seguir) {
-    const indice = pedirProblema();
-    if (indice === null) {
-      const confirmaSalir = confirm("No seleccionaste un problema válido. ¿Querés salir del simulador?");
-      if (confirmaSalir) {
-        break;
-      } else {
-        continue;
-      }
-    }
-
-    const resultado = generarDiagnostico(indice);
-
-    mostrarResultadosYConfirmar(resultado);
-
-    seguir = confirm("¿Deseás realizar otro diagnóstico?");
-  }
-
-  alert("Gracias por usar el Simulador de Diagnóstico de PC. ¡Hasta luego!");
+function guardarEnHistorial(problema) {
+	const historial = obtenerHistorialStorage();
+	historial.unshift(problema);
+	localStorage.setItem("diagnosticoHistorial", JSON.stringify(historial));
+	const historialLista = document.getElementById("historial-lista");
+	cargarHistorial(historial, historialLista);
 }
 
-iniciarSimulador();
+function cargarHistorial(historial, elementoLista) {
+	if (!elementoLista) return;
+
+	elementoLista.innerHTML = "";
+
+	if (historial.length === 0) {
+		elementoLista.innerHTML = "<li>No se realizaron búsquedas.</li>";
+		return;
+	}
+
+	// Creo y agrego un li por cada item del historial
+	historial.forEach(item => {
+		const li = document.createElement("li");
+		li.textContent = item;
+		elementoLista.appendChild(li);
+	});
+}
+
+function iniciarApp() {
+	const problemaSelect = document.getElementById("problema-select");
+	const diagnosticoBtn = document.getElementById("diagnostico-btn");
+	const resultadoContainer = document.getElementById("resultado-container");
+	const historialLista = document.getElementById("historial-lista");
+	const limpiarHistorialBtn = document.getElementById("limpiar-historial-btn");
+
+	cargarSelectProblemas(problemaSelect);
+
+	// Muestro el historial guardado en el localStorage
+	const historialInicial = obtenerHistorialStorage();
+	cargarHistorial(historialInicial, historialLista);
+
+	// Evento click para el boton de Diagnosticar
+	diagnosticoBtn.addEventListener("click", () => {
+		const indiceSeleccionado = problemaSelect.value;
+
+		if (indiceSeleccionado === "") {
+			resultadoContainer.innerHTML = "<p>Por favor, elegí un problema de la lista.</p>";
+			return;
+		}
+
+		const diagnosticoHTML = generarDiagnosticoHTML(indiceSeleccionado);
+		resultadoContainer.innerHTML = diagnosticoHTML;
+
+		const item = datosDiagnostico.find(d => d.id == indiceSeleccionado);
+		guardarEnHistorial(item.problema);
+	});
+
+	// Evento click para el boton de Limpiar Historial
+	limpiarHistorialBtn.addEventListener("click", () => {
+		localStorage.removeItem("diagnosticoHistorial");
+		cargarHistorial([], historialLista);
+	});
+}
+
+// Cuando cargue todo el html traigo los datos del json
+document.addEventListener("DOMContentLoaded", () => {
+	fetch('json/data.json')
+		.then(response => {
+			return response.json();
+		})
+		.then(data => {
+			datosDiagnostico = data;
+			iniciarApp();
+		})
+		.catch(err => {
+			const resultadoContainer = document.getElementById("resultado-container");
+			if (resultadoContainer) {
+				resultadoContainer.innerHTML = `<p style='color: red;'>Error ${err}: No se pudieron cargar los datos de diagnóstico.</p>`;
+			}
+		});
+});

@@ -1,12 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Diagnóstico PC</title>
-    <script src="./js/index.js" defer></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Simulador Diagnóstico PC - Joaquin Stachioni</title>
+	<link rel="stylesheet" href="./css/style.css">
+	<script src="./js/index.js" defer></script>
 </head>
+
 <body>
-    
+
+	<main class="container">
+		<h1>Simulador de Diagnóstico de PC</h1>
+		<p>Seleccioná el problema que presenta tu PC para recibir una guía de posibles soluciones.</p>
+
+		<section class="diagnostico">
+			<div class="controles">
+				<label for="problema-select">Problema detectado:</label>
+				<select id="problema-select">
+					<option value="">Elegí una opción</option>
+				</select>
+				<button id="diagnostico-btn">Obtener Diagnóstico</button>
+			</div>
+
+			<div id="resultado-container">
+				<p>Esperando selección...</p>
+			</div>
+		</section>
+
+		<section class="historial">
+			<h2>Historial de Búsquedas</h2>
+			<button id="limpiar-historial-btn">Limpiar Historial</button>
+			<ul id="historial-lista">
+				<li>No se realizaron búsquedas.</li>
+			</ul>
+		</section>
+
+	</main>
+
 </body>
+
 </html>
