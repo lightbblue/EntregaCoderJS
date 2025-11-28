@@ -2,6 +2,12 @@ function generarDiagnosticoHTML(indiceProblema) {
 	const item = datosDiagnostico.find(d => d.id == indiceProblema);
 
 	if (!item) {
+		Swal.fire({
+			title: 'Error',
+			text:  'No se encontró el problema seleccionado.',
+			icon: 'error',
+			confirmButtonText: 'Aceptar'
+		})
 		return "<p>Error: No se encontró el problema seleccionado.</p>";
 	}
 
@@ -55,7 +61,12 @@ function iniciarApp() {
 		const indiceSeleccionado = problemaSelect.value;
 
 		if (indiceSeleccionado === "") {
-			resultadoContainer.innerHTML = "<p>Por favor, elegí un problema de la lista.</p>";
+			Swal.fire({
+				title: 'Aviso',
+				text:  'Por favor, elegí un problema de la lista.',
+				icon: 'warning',
+				confirmButtonText: 'Aceptar'
+			})
 			return;
 		}
 
@@ -82,8 +93,10 @@ fetch('data/data.json')
 		iniciarApp();
 	})
 	.catch(err => {
-		const resultadoContainer = document.getElementById("resultado-container");
-		if (resultadoContainer) {
-			resultadoContainer.innerHTML = `<p style='color: red;'>Error ${err}: No se pudieron cargar los datos de diagnóstico.</p>`;
-		}
+		Swal.fire({
+			title: 'Error',
+			text:  'No se pudieron cargar los datos de diagnóstico.',
+			icon: 'error',
+			confirmButtonText: 'Aceptar'
+		})
 	});
